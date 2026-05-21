@@ -1,0 +1,39 @@
+name: bilibili-daily-task
+
+on:
+  workflow_dispatch:
+  schedule:
+    # UTC 时间；北京时间 = UTC + 8
+    # 这里表示每天北京时间 08:37 执行
+    - cron: '37 18 * * *'  
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bilibili-daily-task
+  cancel-in-progress: true
+
+env:
+  TZ: Asia/Shanghai
+  ASPNETCORE_ENVIRONMENT: Production
+  Ray_BiliBiliCookies__1: ${{ secrets.COOKIESTR }}
+
+jobs:
+  run-daily-task:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Run Daily task
+        run: |
+          dotnet run \
+            --project ./src/Ray.BiliBiliTool.Console/Ray.BiliBiliTool.Console.csproj \
+            -- --runTasks=Daily
