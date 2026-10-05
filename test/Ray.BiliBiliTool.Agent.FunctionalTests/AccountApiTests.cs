@@ -8,9 +8,11 @@ using Ray.BiliBiliTool.Console;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
+[Trait("Category", "External")]
 public class AccountApiTests
 {
     private readonly IAccountApi _api;
+    private readonly BiliCookie _ck;
 
     public AccountApiTests()
     {
@@ -22,18 +24,19 @@ public class AccountApiTests
         };
         IHost host = Program.CreateHost(envs.ToArray());
         _api = host.Services.GetRequiredService<IAccountApi>();
+        _ck = ExternalCookie.Require(host.Services);
     }
 
     [Fact]
     public async Task GetCoinBalance_Normal_GetCoinBalance()
     {
         // Act
-        BiliApiResponse<CoinBalance> re = await _api.GetCoinBalanceAsync(null);
+        BiliApiResponse<CoinBalance> re = await _api.GetCoinBalanceAsync(_ck.ToString());
 
         // Arrange
 
         // Assert
         re.Code.Should().Be(0);
-        re.Data.Money.Should().NotBeNull();
+        re.Data!.Money.Should().NotBeNull();
     }
 }

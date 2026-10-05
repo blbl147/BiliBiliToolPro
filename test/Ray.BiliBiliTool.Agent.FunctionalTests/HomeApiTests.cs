@@ -6,6 +6,7 @@ using Ray.BiliBiliTool.Console;
 
 namespace Ray.BiliBiliTool.Agent.FunctionalTests;
 
+[Trait("Category", "External")]
 public class HomeApiTests
 {
     private readonly IHomeApi _api;
@@ -21,7 +22,7 @@ public class HomeApiTests
             //"HTTPS_PROXY=localhost:8888"
         };
         IHost host = Program.CreateHost(envs.ToArray());
-        _ck = host.Services.GetRequiredService<BiliCookie>();
+        _ck = ExternalCookie.Require(host.Services);
         _api = host.Services.GetRequiredService<IHomeApi>();
     }
 
